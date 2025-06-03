@@ -18,11 +18,6 @@ The results of the developer survey can be found in the following files in the r
 
 ---
 
-## Tool
-Here is the link to another anonymous repo containing our tool: [https://anonymous.4open.science/r/Untangle2Weave-39E7/README.md](https://anonymous.4open.science/r/Untangle2Weave-39E7/README.md)
-
----
-
 ## Pull Requests
 Anonymous links to the PRs we raised can be found below:
 

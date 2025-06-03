@@ -21,17 +21,19 @@ Contains all research artifacts, data, and results from our comprehensive empiri
 
 **What's included:**
 - Developer survey questions and methodology (`Developer Preference Survey.pdf`)
-- Complete survey responses from 34 software engineers and 15 students (`Industry Responses.xlsx`) (`Student Responses.xlsx`)
+- Complete survey responses from 34 software engineers and 15 students:
+    - `(Industry) Unit Test Style Preference Study (Original Responses).xlsx`
+    - `(Students) Unit Test Style Preference Study (Original Responses).xlsx`
 - Tool evaluation results across 49 open-source projects (`Reports.xlsx`)
-- Original and refactored test files from all subject projects (`/OriginalAndRefactoredTestFiles`)
-- Anonymous links to 19 submitted pull requests (15 accepted by maintainers) [Links in ReadMe] ([Empirical Studies Artifacts](https://anonymous.4open.science/r/ASE_Arteafacts-75C5/Empirical%20Studies%20Artifacts/README.md))
+- Original and refactored test files from all subject projects (`OriginalAndRefactoredTestFiles/`)
+- Anonymous links to 19 submitted pull requests (15 accepted by maintainers) - see [README](https://anonymous.4open.science/r/ASE_Arteafacts-75C5/Empirical%20Studies%20Artifacts/README.md) for complete list
 
 ---
 
 ## Quick Start
 
-1. **To use the U2W tool**: Navigate to the [`U2W Source Code`](./U2W%20Source%20Code) folder and follow the setup instructions
-2. **To explore research data**: Check the [`Empirical Studies Artifacts`](./Empirical%20Studies%20Artifacts) folder for survey results, evaluation data, and example refactorings
+1. **To use the U2W tool**: Navigate to the [U2W Source Code](https://anonymous.4open.science/r/ASE_Arteafacts-75C5/U2W%20Source%20Code/README.md) folder and follow the setup instructions
+2. **To explore research data**: Check the [Empirical Studies Artifacts](https://anonymous.4open.science/r/ASE_Arteafacts-75C5/Empirical%20Studies%20Artifacts/README.md) folder for survey results, evaluation data, and example refactorings
 
 ---
 
