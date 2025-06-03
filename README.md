@@ -6,7 +6,7 @@ This repository contains the complete set of artifacts for our ASE 2025 paper on
 
 ## Repository Structure
 
-### 📁 [U2W Source Code](./U2W%20Source%20Code)
+### 📁 [U2W Source Code](https://anonymous.4open.science/r/ASE_Arteafacts-75C5/U2W%20Source%20Code/README.md)
 Contains the complete source code and implementation of **U2W (Untangle to Weave)** - our program analysis-based tool that automatically detects and refactors Disjoint Assertion Tangles in unit tests.
 
 **What's included:**
@@ -16,16 +16,15 @@ Contains the complete source code and implementation of **U2W (Untangle to Weave
 - Detailed usage instructions and examples
 - Configuration options for different execution modes
 
-### 📁 [Empirical Studies Artifacts](./Empirical%20Studies%20Artifacts)
+### 📁 [Empirical Studies Artifacts](https://anonymous.4open.science/r/ASE_Arteafacts-75C5/Empirical%20Studies%20Artifacts/README.md)
 Contains all research artifacts, data, and results from our comprehensive empirical evaluation of the DAT smell and U2W tool effectiveness.
 
 **What's included:**
 - Developer survey questions and methodology (`Developer Preference Survey.pdf`)
-- Complete survey responses from 34 software engineers and 15 students
+- Complete survey responses from 34 software engineers and 15 students (`Industry Responses.xlsx`) (`Student Responses.xlsx`)
 - Tool evaluation results across 49 open-source projects (`Reports.xlsx`)
-- Original and refactored test files from all subject projects
-- Anonymous links to 19 submitted pull requests (15 accepted by maintainers)
-- Detailed analysis of 42,334 tests and 3,638 refactored smelly tests
+- Original and refactored test files from all subject projects (`/OriginalAndRefactoredTestFiles`)
+- Anonymous links to 19 submitted pull requests (15 accepted by maintainers) [Links in ReadMe] ([Empirical Studies Artifacts](https://anonymous.4open.science/r/ASE_Arteafacts-75C5/Empirical%20Studies%20Artifacts/README.md))
 
 ---
 
