@@ -152,7 +152,7 @@ public class Untangle2Weave {
                                 .anyMatch(annotationName -> annotationName.equals("Ignore") || annotationName.equals("Disabled"));
 
                         if (isTestMethod && !isSkipped) {
-    //                      System.out.println("Test method found: " + method.getNameAsString());
+                            //                      System.out.println("Test method found: " + method.getNameAsString());
                             testCounter++;
                             testMethodNames.add(method.getNameAsString());
                         }
@@ -630,9 +630,9 @@ public class Untangle2Weave {
                 if (node instanceof LiteralExpr) {
                     // && currentPath == pathId+1
 //                    if (currentPathCounter == pathCounter) {
-                        // Replace this specific literal
-                        ((LiteralExpr) node).replace(new NameExpr(parameterName));
-                        return;
+                    // Replace this specific literal
+                    ((LiteralExpr) node).replace(new NameExpr(parameterName));
+                    return;
 //                    }
 //                    currentPathCounter++;
                 }
@@ -2125,10 +2125,10 @@ public class Untangle2Weave {
 //                .filter(method -> !hasComplexControlStructures(method)) // ToDo: Count number of tests excluded
                 .forEach(testMethod -> {
                     totalTests.getAndIncrement();
+                    result.allObservedTests.add(testMethod.getNameAsString());
                     if(hasComplexControlStructures(testMethod, filteredTestsMap)) {
                         return;
                     }
-
                     totalConsideredTests.getAndIncrement();
 //                    if(hasComplexControlStructures(testMethod)) {
 //
@@ -2816,9 +2816,9 @@ public class Untangle2Weave {
         cu.findAll(MethodDeclaration.class).stream()
                 .filter(method -> method.getNameAsString().startsWith(methodPrefix))
                 .forEach(method -> {
-                    newTests.add(method);
-                }
-        );
+                            newTests.add(method);
+                        }
+                );
         int totalAssertions = 0;
         for (MethodDeclaration newTest : newTests) {
             List<MethodCallExpr> assertions = extractAssertions(newTest);
@@ -2848,10 +2848,10 @@ public class Untangle2Weave {
             String analyticsMethodKey = className + "#" + test;
             analyticsMap.put(
                     analyticsMethodKey, new TestAnalytics(
-                        className,
-                        test,
-                        testClassResult.independentLogicsInTest.get(test),
-                        extractTestLogicLineCount(cu, test)
+                            className,
+                            test,
+                            testClassResult.independentLogicsInTest.get(test),
+                            extractTestLogicLineCount(cu, test)
                     )
             );
         }
@@ -2906,7 +2906,16 @@ public class Untangle2Weave {
 
     public static void collectTestAnalyticsAfterPhaseII(TestFileResult testClassResult, String putsFile, List<List<UnitTest>> similarTestGroups) throws FileNotFoundException {
         String className = extractClassName(testClassResult.filePath);
-        CompilationUnit cu = configureJavaParserAndGetCompilationUnit(putsFile);
+        CompilationUnit cu;
+
+        try {
+            cu = configureJavaParserAndGetCompilationUnit(putsFile);
+        } catch (Exception e) {
+            // Silently skip parsing errors for Phase II analytics (e.g., Unicode characters)
+            // Phase II analytics is an enhancement - main analysis continues without it
+            System.out.println("Skipping Phase II analytics for " + className + " due to parsing error: " + e.getMessage());
+            return;
+        }
 
         for(String test: testClassResult.listPastaTests) {
             String analyticsMethodKey = className + "#" + test;
@@ -2988,9 +2997,15 @@ public class Untangle2Weave {
                 String putsFile = createParameterizedTestFile(purifiedOutputFilePath, newPUTs, extractTestMethodsToExclude(similarTestGroups));
                 collectTestAnalyticsAfterPhaseII(testClassResult, putsFile, similarTestGroups);
 
-                CompilationUnit cuPut = configureJavaParserAndGetCompilationUnit(putsFile);
-                // check logic ? ? ?
-                totalTestsAfterP2 += countTestMethods(cuPut);
+                try {
+                    CompilationUnit cuPut = configureJavaParserAndGetCompilationUnit(putsFile);
+                    // check logic ? ? ?
+                    totalTestsAfterP2 += countTestMethods(cuPut);
+                } catch (Exception e) {
+                    // Silently skip parsing errors for test counting (e.g., Unicode characters)
+                    // Test counting is for statistics - main analysis continues without it
+                    System.out.println("Skipping test counting for " + extractClassName(testClassResult.filePath) + " due to parsing error: " + e.getMessage());
+                }
             }
         }
 //        System.out.println("Total potential PUTs: " + totalPotentialPuts);
@@ -3032,9 +3047,31 @@ public class Untangle2Weave {
         aggregated.totalConsideredTests += result.totalConsideredTests;
         aggregated.pastaCount += result.pastaCount;
         aggregated.totalLocInObservedTests += result.totalLocInObservedTests;
+
         // Merge the maps
         for (Map.Entry<String, Integer> entry : result.filteredTestsMap.entrySet()) {
             aggregated.filteredTestsMap.merge(entry.getKey(), entry.getValue(), Integer::sum);
+        }
+
+        // Aggregate the test lists with file path information
+        if (result.allObservedTests != null) {
+            if (aggregated.allObservedTests == null) {
+                aggregated.allObservedTests = new ArrayList<>();
+            }
+            // Add tests with file path prefix to distinguish source
+            for (String testMethod : result.allObservedTests) {
+                aggregated.allObservedTests.add(result.filePath + ":" + testMethod);
+            }
+        }
+
+        if (result.listPastaTests != null) {
+            if (aggregated.listPastaTests == null) {
+                aggregated.listPastaTests = new ArrayList<>();
+            }
+            // Add pasta tests with file path prefix
+            for (String pastaTest : result.listPastaTests) {
+                aggregated.listPastaTests.add(result.filePath + ":" + pastaTest);
+            }
         }
 
         return aggregated;
@@ -3047,117 +3084,117 @@ public class Untangle2Weave {
      * @throws IOException If an I/O error occurs
      */
     public static void fixAssertionPastaInMultipleRepositoriesAndGenerateReports(String commaSeparatedPaths) throws IOException {
-            String reportOutputDir = "/Users/monilnarang/Documents/Research Evaluations/1May";
-            // Create output directory if it doesn't exist
-            File outputDir = new File(reportOutputDir);
-            if (!outputDir.exists()) {
-                outputDir.mkdirs();
-            }
-
-            // Split the input string by commas
-            String[] paths = commaSeparatedPaths.split(",");
-
-            // Create a StringBuilder to collect all reports
-            StringBuilder allReportsBuilder = new StringBuilder();
-            allReportsBuilder.append("# Assertion Pasta Fix Reports\n\n");
-
-            // Track overall statistics
-            int totalTestSplitted = 0;
-            int totalPotentialPuts = 0;
-            int totalNewPutsCreated = 0;
-
-            // Process each path
-            for (String path : paths) {
-                String trimmedPath = path.trim();
-                System.out.println("Processing repository: " + trimmedPath);
-
-                // Create a StringBuilder for the current report
-                StringBuilder reportBuilder = new StringBuilder();
-                reportBuilder.append("## Repository: ").append(trimmedPath).append("\n\n");
-
-                try {
-                    // Redirect System.out temporarily to capture the output
-                    PrintStream originalOut = System.out;
-                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                    PrintStream capturedOut = new PrintStream(outputStream);
-                    System.setOut(capturedOut);
-
-                    // Call the original method
-                    fixAssertionPastaInRepo(trimmedPath);
-
-                    // Restore the original System.out
-                    System.setOut(originalOut);
-
-                    // Get the captured output
-                    String capturedOutput = outputStream.toString();
-                    System.out.println(capturedOutput); // Print to console as well
-
-                    // Extract statistics from the captured output
-                    String[] lines = capturedOutput.split("\n");
-                    int potentialPuts = 0;
-                    int newPutsCreated = 0;
-
-                    for (String line : lines) {
-                        reportBuilder.append("- ").append(line).append("\n");
-
-                        if (line.startsWith("Total potential PUTs:")) {
-                            potentialPuts = Integer.parseInt(line.substring("Total potential PUTs:".length()).trim());
-                            totalPotentialPuts += potentialPuts;
-                        } else if (line.startsWith("Total new PUTs created:")) {
-                            newPutsCreated = Integer.parseInt(line.substring("Total new PUTs created:".length()).trim());
-                            totalNewPutsCreated += newPutsCreated;
-                        } else if (line.startsWith("Total new separated tests created:")) {
-                            totalTestSplitted += Integer.parseInt(line.substring("Total new separated tests created:".length()).trim());
-                        }
-                    }
-
-                    // Calculate PUT conversion percentage
-                    double putConversionPercentage = potentialPuts > 0 ?
-                            ((double) newPutsCreated / potentialPuts) * 100 : 0;
-
-                    reportBuilder.append("- PUT Conversion Rate: ")
-                            .append(String.format("%.2f%%", putConversionPercentage))
-                            .append("\n\n");
-                } catch (Exception e) {
-                    reportBuilder.append("### Error\n");
-                    reportBuilder.append("- Error processing repository: ").append(e.getMessage()).append("\n\n");
-                    System.err.println("Error processing repository " + trimmedPath + ": " + e.getMessage());
-                    e.printStackTrace();
-                }
-
-                // Write the individual report to a file
-                String safeFileName = trimmedPath.replaceAll("[^a-zA-Z0-9.-]", "_");
-                String reportFileName = outputDir.getPath() + File.separator + "assertion_pasta_report_" + safeFileName + ".md";
-                try (FileWriter writer = new FileWriter(reportFileName)) {
-                    writer.write(reportBuilder.toString());
-                }
-
-                System.out.println("Report generated: " + reportFileName);
-
-                // Add this report to the overall report
-                allReportsBuilder.append(reportBuilder);
-            }
-
-            // Calculate overall PUT conversion percentage
-            double overallPutConversionPercentage = totalPotentialPuts > 0 ?
-                    ((double) totalNewPutsCreated / totalPotentialPuts) * 100 : 0;
-
-            allReportsBuilder.append("## Summary\n\n");
-            allReportsBuilder.append("- Total tests splitted across all repositories: ").append(totalTestSplitted).append("\n");
-            allReportsBuilder.append("- Total potential PUTs across all repositories: ").append(totalPotentialPuts).append("\n");
-            allReportsBuilder.append("- Total new PUTs created across all repositories: ").append(totalNewPutsCreated).append("\n");
-            allReportsBuilder.append("- Overall PUT Conversion Rate: ")
-                    .append(String.format("%.2f%%", overallPutConversionPercentage))
-                    .append("\n");
-
-            // Write the combined report to a file
-            String allReportsFileName = outputDir.getPath() + File.separator + "all_assertion_pasta_reports.md";
-            try (FileWriter writer = new FileWriter(allReportsFileName)) {
-                writer.write(allReportsBuilder.toString());
-            }
-
-            System.out.println("Combined report generated: " + allReportsFileName);
+        String reportOutputDir = "/Users/monilnarang/Documents/Research Evaluations/1May";
+        // Create output directory if it doesn't exist
+        File outputDir = new File(reportOutputDir);
+        if (!outputDir.exists()) {
+            outputDir.mkdirs();
         }
+
+        // Split the input string by commas
+        String[] paths = commaSeparatedPaths.split(",");
+
+        // Create a StringBuilder to collect all reports
+        StringBuilder allReportsBuilder = new StringBuilder();
+        allReportsBuilder.append("# Assertion Pasta Fix Reports\n\n");
+
+        // Track overall statistics
+        int totalTestSplitted = 0;
+        int totalPotentialPuts = 0;
+        int totalNewPutsCreated = 0;
+
+        // Process each path
+        for (String path : paths) {
+            String trimmedPath = path.trim();
+            System.out.println("Processing repository: " + trimmedPath);
+
+            // Create a StringBuilder for the current report
+            StringBuilder reportBuilder = new StringBuilder();
+            reportBuilder.append("## Repository: ").append(trimmedPath).append("\n\n");
+
+            try {
+                // Redirect System.out temporarily to capture the output
+                PrintStream originalOut = System.out;
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                PrintStream capturedOut = new PrintStream(outputStream);
+                System.setOut(capturedOut);
+
+                // Call the original method
+                fixAssertionPastaInRepo(trimmedPath);
+
+                // Restore the original System.out
+                System.setOut(originalOut);
+
+                // Get the captured output
+                String capturedOutput = outputStream.toString();
+                System.out.println(capturedOutput); // Print to console as well
+
+                // Extract statistics from the captured output
+                String[] lines = capturedOutput.split("\n");
+                int potentialPuts = 0;
+                int newPutsCreated = 0;
+
+                for (String line : lines) {
+                    reportBuilder.append("- ").append(line).append("\n");
+
+                    if (line.startsWith("Total potential PUTs:")) {
+                        potentialPuts = Integer.parseInt(line.substring("Total potential PUTs:".length()).trim());
+                        totalPotentialPuts += potentialPuts;
+                    } else if (line.startsWith("Total new PUTs created:")) {
+                        newPutsCreated = Integer.parseInt(line.substring("Total new PUTs created:".length()).trim());
+                        totalNewPutsCreated += newPutsCreated;
+                    } else if (line.startsWith("Total new separated tests created:")) {
+                        totalTestSplitted += Integer.parseInt(line.substring("Total new separated tests created:".length()).trim());
+                    }
+                }
+
+                // Calculate PUT conversion percentage
+                double putConversionPercentage = potentialPuts > 0 ?
+                        ((double) newPutsCreated / potentialPuts) * 100 : 0;
+
+                reportBuilder.append("- PUT Conversion Rate: ")
+                        .append(String.format("%.2f%%", putConversionPercentage))
+                        .append("\n\n");
+            } catch (Exception e) {
+                reportBuilder.append("### Error\n");
+                reportBuilder.append("- Error processing repository: ").append(e.getMessage()).append("\n\n");
+                System.err.println("Error processing repository " + trimmedPath + ": " + e.getMessage());
+                e.printStackTrace();
+            }
+
+            // Write the individual report to a file
+            String safeFileName = trimmedPath.replaceAll("[^a-zA-Z0-9.-]", "_");
+            String reportFileName = outputDir.getPath() + File.separator + "assertion_pasta_report_" + safeFileName + ".md";
+            try (FileWriter writer = new FileWriter(reportFileName)) {
+                writer.write(reportBuilder.toString());
+            }
+
+            System.out.println("Report generated: " + reportFileName);
+
+            // Add this report to the overall report
+            allReportsBuilder.append(reportBuilder);
+        }
+
+        // Calculate overall PUT conversion percentage
+        double overallPutConversionPercentage = totalPotentialPuts > 0 ?
+                ((double) totalNewPutsCreated / totalPotentialPuts) * 100 : 0;
+
+        allReportsBuilder.append("## Summary\n\n");
+        allReportsBuilder.append("- Total tests splitted across all repositories: ").append(totalTestSplitted).append("\n");
+        allReportsBuilder.append("- Total potential PUTs across all repositories: ").append(totalPotentialPuts).append("\n");
+        allReportsBuilder.append("- Total new PUTs created across all repositories: ").append(totalNewPutsCreated).append("\n");
+        allReportsBuilder.append("- Overall PUT Conversion Rate: ")
+                .append(String.format("%.2f%%", overallPutConversionPercentage))
+                .append("\n");
+
+        // Write the combined report to a file
+        String allReportsFileName = outputDir.getPath() + File.separator + "all_assertion_pasta_reports.md";
+        try (FileWriter writer = new FileWriter(allReportsFileName)) {
+            writer.write(allReportsBuilder.toString());
+        }
+
+        System.out.println("Combined report generated: " + allReportsFileName);
+    }
 
     public static ResultCreateRefreshedTestFilesInSandbox fixAssertionPastaInRepo(String pathToJavaRepository) throws IOException {
         List<TestFileResult> results = getAssertionPastaResultsInRepo(pathToJavaRepository);
@@ -3721,6 +3758,235 @@ public class Untangle2Weave {
         }
     }
 
+    /**
+     * Collects all production methods in the repository (non-test methods)
+     */
+    public static Set<String> collectProductionMethods(String pathToJavaRepository) throws IOException {
+        Set<String> productionMethods = new HashSet<>();
+
+        // Find all Java files (excluding test files)
+        Files.walk(Paths.get(pathToJavaRepository))
+                .filter(Files::isRegularFile)
+                .filter(path -> path.toString().endsWith(".java"))
+                .filter(path -> !isTestFile(path.toString()))
+                .filter(path -> !path.toString().matches(".*(_Purified|_Parameterized|_Parameterized_GPT)\\.java$"))
+                .forEach(path -> {
+                    try {
+                        CompilationUnit cu = configureJavaParserAndGetCompilationUnit(path.toString());
+                        String packageName = cu.getPackageDeclaration()
+                                .map(pd -> pd.getNameAsString())
+                                .orElse("");
+
+                        // Find all classes and their methods
+                        cu.findAll(ClassOrInterfaceDeclaration.class).forEach(clazz -> {
+                            String className = packageName.isEmpty() ? clazz.getNameAsString() :
+                                    packageName + "." + clazz.getNameAsString();
+
+                            clazz.getMethods().forEach(method -> {
+                                // Skip constructors, private methods, and test methods
+                                if (!method.getNameAsString().equals(clazz.getNameAsString()) && // Not a constructor
+                                        !method.isPrivate() &&
+                                        method.getAnnotationByName("Test").isEmpty()) {
+
+                                    String methodSignature = className + "." + method.getNameAsString();
+                                    productionMethods.add(methodSignature);
+                                }
+                            });
+                        });
+                    } catch (Exception e) {
+                        // Silently skip all parsing errors during production method collection
+                        // Production method analysis is an enhancement - main analysis continues without it
+                        // Uncomment next line for debugging: System.err.println("Skipping file due to parsing issues: " + path);
+                    }
+                });
+
+        System.out.println("Found " + productionMethods.size() + " production methods");
+        return productionMethods;
+    }
+
+    /**
+     * Analyzes a test method to find production method calls
+     */
+    public static List<String> findProductionMethodCalls(CompilationUnit cu, String testMethodName, Set<String> productionMethods) {
+        List<String> calledMethods = new ArrayList<>();
+
+        // Find the test method
+        Optional<MethodDeclaration> testMethodOpt = cu.findAll(MethodDeclaration.class).stream()
+                .filter(m -> m.getNameAsString().equals(testMethodName))
+                .filter(m -> m.getAnnotationByName("Test").isPresent())
+                .findFirst();
+
+        if (testMethodOpt.isPresent()) {
+            MethodDeclaration testMethod = testMethodOpt.get();
+
+            // Find all method call expressions in the test method
+            testMethod.findAll(MethodCallExpr.class).forEach(methodCall -> {
+                String methodName = methodCall.getNameAsString();
+
+                // Try to resolve the method call to a production method
+                String scope = "";
+                if (methodCall.getScope().isPresent()) {
+                    scope = methodCall.getScope().get().toString();
+                }
+
+                // Check against production methods - count ALL calls (including duplicates)
+                for (String prodMethod : productionMethods) {
+                    if (prodMethod.endsWith("." + methodName)) {
+                        // Simple heuristic - if method names match, consider it a match
+                        // This could be made more sophisticated with full type resolution
+                        calledMethods.add(prodMethod);  // Add all matches, including duplicates
+                        break;  // Still break to avoid multiple matches for the same method call
+                    }
+                }
+            });
+        }
+
+        return calledMethods;
+    }
+
+    /**
+     * Creates an XLSX file with all test methods using aggregated data from analysis
+     */
+    public static void createTestMethodsXLSX(TestFileResult aggregatedResult, String outputFilePath, String pathToJavaRepository) throws IOException {
+        List<TestMethodInfo> allTestMethods = new ArrayList<>();
+
+        // First, collect all production methods in the repository
+        System.out.println("Collecting production methods from repository...");
+        Set<String> productionMethods = collectProductionMethods(pathToJavaRepository);
+
+        // Use the aggregated test data instead of re-processing files
+        if (aggregatedResult != null && aggregatedResult.allObservedTests != null) {
+            for (String testWithFilePath : aggregatedResult.allObservedTests) {
+                // Parse file path and method name (format: "filePath:methodName")
+                String[] parts = testWithFilePath.split(":", 2);
+                if (parts.length != 2) continue;
+
+                String filePath = parts[0];
+                String methodName = parts[1];
+                String className = extractClassName(filePath);
+
+                // Calculate LOC for this test method
+                int loc = 0;
+                List<String> productionMethodsCalled = new ArrayList<>();
+
+                try {
+                    CompilationUnit cu = configureJavaParserAndGetCompilationUnit(filePath);
+                    loc = extractTestLogicLineCount(cu, methodName);
+
+                    // Find production method calls in this test
+                    productionMethodsCalled = findProductionMethodCalls(cu, methodName, productionMethods);
+                } catch (Exception e) {
+                    System.err.println("Error analyzing test method " + methodName + " in " + filePath);
+                }
+
+                // Check if it's assertion pasta
+                boolean isAssertionPasta = aggregatedResult.listPastaTests != null &&
+                        aggregatedResult.listPastaTests.contains(testWithFilePath);
+
+                TestMethodInfo testMethodInfo = new TestMethodInfo(
+                        className, methodName, loc, isAssertionPasta,
+                        productionMethodsCalled.size(), productionMethodsCalled
+                );
+
+                allTestMethods.add(testMethodInfo);
+            }
+        }
+
+        // Export to XLSX
+        exportTestMethodsToXLSX(allTestMethods, outputFilePath);
+        System.out.println("Test methods XLSX file created: " + outputFilePath);
+    }
+
+    /**
+     * Exports test method information to XLSX file
+     */
+    private static void exportTestMethodsToXLSX(List<TestMethodInfo> testMethods, String outputFilePath) throws IOException {
+        // Ensure directory exists
+        File directory = new File(outputFilePath.substring(0, outputFilePath.lastIndexOf('/')));
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        // Create workbook
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("All Test Methods");
+
+        // Create cell style for headers
+        CellStyle headerStyle = workbook.createCellStyle();
+        Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        headerStyle.setFont(headerFont);
+
+        // Create header row
+        Row headerRow = sheet.createRow(0);
+        String[] headers = {
+                "Class Name", "Method Name", "LOC", "Is Assertion Pasta",
+                "Production Method Call Count", "Production Methods Called"
+        };
+
+        for (int i = 0; i < headers.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(headers[i]);
+            cell.setCellStyle(headerStyle);
+        }
+
+        // Add data rows
+        int rowIdx = 1;
+        for (TestMethodInfo testMethod : testMethods) {
+            Row row = sheet.createRow(rowIdx++);
+
+            row.createCell(0).setCellValue(testMethod.className);
+            row.createCell(1).setCellValue(testMethod.methodName);
+            row.createCell(2).setCellValue(testMethod.loc);
+            row.createCell(3).setCellValue(testMethod.isAssertionPasta);
+            row.createCell(4).setCellValue(testMethod.productionMethodCallCount);
+
+            // Join unique production methods with semicolon separator (count remains total including duplicates)
+            String productionMethodsList = "";
+            if (testMethod.productionMethodsCalled != null) {
+                // Get unique methods while preserving order
+                java.util.Set<String> uniqueMethods = new java.util.LinkedHashSet<>(testMethod.productionMethodsCalled);
+                productionMethodsList = String.join("; ", uniqueMethods);
+            }
+            row.createCell(5).setCellValue(productionMethodsList);
+        }
+
+        // Add summary statistics
+        rowIdx += 2; // Skip a row
+        Row summaryTitleRow = sheet.createRow(rowIdx++);
+        Cell summaryTitleCell = summaryTitleRow.createCell(0);
+        summaryTitleCell.setCellValue("Summary Statistics");
+        summaryTitleCell.setCellStyle(headerStyle);
+
+        // Calculate statistics
+        int totalTests = testMethods.size();
+        int totalAssertionPasta = (int) testMethods.stream().filter(t -> t.isAssertionPasta).count();
+        int totalLOC = testMethods.stream().mapToInt(t -> t.loc).sum();
+        int totalProductionMethodCalls = testMethods.stream().mapToInt(t -> t.productionMethodCallCount).sum();
+        double avgProductionMethodCalls = totalTests > 0 ? (double) totalProductionMethodCalls / totalTests : 0.0;
+
+        // Add summary rows
+        addSummaryRow(sheet, rowIdx++, "Total Test Methods", totalTests);
+        addSummaryRow(sheet, rowIdx++, "Total Assertion Pasta Tests", totalAssertionPasta);
+        addSummaryRow(sheet, rowIdx++, "Total LOC", totalLOC);
+        addSummaryRow(sheet, rowIdx++, "Total Production Method Calls", totalProductionMethodCalls);
+        addSummaryRow(sheet, rowIdx++, "Assertion Pasta %", totalTests > 0 ? (totalAssertionPasta * 100.0 / totalTests) : 0.0);
+        addSummaryRow(sheet, rowIdx++, "Avg Production Method Calls per Test", avgProductionMethodCalls);
+
+        // Auto-size columns
+        for (int i = 0; i < headers.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        // Write to file
+        FileOutputStream fileOut = new FileOutputStream(outputFilePath);
+        workbook.write(fileOut);
+        fileOut.close();
+        workbook.close();
+    }
+
+
+
     public static void main(String[] args) throws IOException {
         if (args.length < 2) {
             throw new IllegalArgumentException("Please provide the path to the input file as an argument.");
@@ -3735,9 +4001,9 @@ public class Untangle2Weave {
                 detectAssertionPastaAndGenerateReport(file.trim()); // Trim spaces to avoid errors
             }
             // print map Map<Integer, Integer> separableComponentFrequency = new HashMap<>();
-             for (Map.Entry<Integer, Integer> entry : separableComponentFrequency.entrySet()) {
+            for (Map.Entry<Integer, Integer> entry : separableComponentFrequency.entrySet()) {
                 System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
-             }
+            }
         }
         else if (operation.equals("allReposFix")) {
             fixAssertionPastaInMultipleRepositoriesAndGenerateReports(inputFile);
@@ -3751,6 +4017,10 @@ public class Untangle2Weave {
             String outputFilePath = "/Users/monilnarang/Documents/Research Evaluations/analytics/Apr22/analysis.xlsx";
 //            exportAnalyticsToCSV(outputFilePath, result);
             exportAnalyticsToXLSX(outputFilePath, result, repoName);
+
+            // Create the new XLSX file with all test methods using aggregated data
+            String testMethodsOutputPath = "/Users/monilnarang/Documents/Research Evaluations/analytics/Apr22/all_test_methods_" + repoName + ".xlsx";
+            createTestMethodsXLSX(result.aggregatedResult, testMethodsOutputPath, inputFile);
         } else if(operation.equals("fixInAllRepoWithXLSXReport")) {
             String[] inputFiles = inputFile.split(","); // Split the comma-separated paths
             for (String file : inputFiles) {
@@ -3832,10 +4102,3 @@ public class Untangle2Weave {
 
 
 // And if after unique line count is less than before skip that test? (e.g. , Thread.sleep(1000);)
-
-
-
-
-
-
-
