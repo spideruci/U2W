@@ -1,17 +1,17 @@
-# Test Categories for Eager and Verbos Smell Detection
+# Test Categories for Eager and Verbose Smell Detection
 
 ## Definitions
 
 Based on the previous analysis and script definitions:
 
 - **Eager Smell**: Production Method Call Count >= 4
-- **Verbos Smell**: Lines of Code (LOC) >= 13  
+- **Verbose Smell**: Lines of Code (LOC) >= 13  
 - **DAT Smell**: Assertion Pasta (duplicate assertion testing)
 
 
 ## Notes
 
-- These categories are mutually exclusive within each smell type comparison (Eager vs DAT, Verbos vs DAT)
+- These categories are mutually exclusive within each smell type comparison (Eager vs DAT, Verbose vs DAT)
 - All examples were extracted from actual test files in the subject projects directory
 
 
@@ -102,9 +102,9 @@ public void testOperators() {
 }
 ```
 
-### Verbos Smell Examples
+### Verbose Smell Examples
 
-#### 4. **Only Verbos Smell Example**
+#### 4. **Only Verbose Smell Example**
 
 **File:** `Undertow/CompressionUtilsTest.java`
 **Method:** `testPadding`
@@ -155,7 +155,7 @@ public void testMinuteFragmentInLargerUnitWithCalendar() {
 }
 ```
 
-#### 6. **Both DAT and Verbos Smells Example**
+#### 6. **Both DAT and Verbose Smells Example**
 **File:** `druid/OutputTypeTest.java`
 **Method:** `testArrayFunctions`
 **Metrics:** LOC=49, PMC=2, DAT=True
