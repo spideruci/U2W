@@ -6,7 +6,7 @@ This repository contains the complete set of artifacts for our ASE 2025 paper on
 
 ## Repository Structure
 
-### 📁 [U2W Source Code](https://anonymous.4open.science/r/ASE_Arteafacts-75C5/U2W%20Source%20Code/README.md)
+### 📁 [U2W Source Code](https://github.com/spideruci/U2W/tree/main/U2W%20Source%20Code#readme)
 Contains the complete source code and implementation of **U2W (Untangle to Weave)** - our program analysis-based tool that automatically detects and refactors Disjoint Assertion Tangles in unit tests.
 
 **What's included:**
@@ -16,7 +16,7 @@ Contains the complete source code and implementation of **U2W (Untangle to Weave
 - Detailed usage instructions and examples
 - Configuration options for different execution modes
 
-### 📁 [Empirical Studies Artifacts](https://anonymous.4open.science/r/ASE_Arteafacts-75C5/Empirical%20Studies%20Artifacts/README.md)
+### 📁 [Empirical Studies Artifacts](https://github.com/spideruci/U2W/tree/main/Empirical%20Studies%20Artifacts#readme)
 Contains all research artifacts, data, and results from our comprehensive empirical evaluation of the DAT smell and U2W tool effectiveness.
 
 **What's included:**
@@ -26,14 +26,14 @@ Contains all research artifacts, data, and results from our comprehensive empiri
     - `(Students) Unit Test Style Preference Study (Original Responses).xlsx`
 - Tool evaluation results across 49 open-source projects (`Reports.xlsx`)
 - Original and refactored test files from all subject projects (`OriginalAndRefactoredTestFiles/`)
-- Anonymous links to 19 submitted pull requests (15 accepted by maintainers) - see [README](https://anonymous.4open.science/r/ASE_Arteafacts-75C5/Empirical%20Studies%20Artifacts/README.md) for complete list
+- Anonymous links to 19 submitted pull requests (16 accepted by maintainers) - see [README](https://github.com/spideruci/U2W/tree/main/Empirical%20Studies%20Artifacts#readme) for complete list
 
 ---
 
 ## Quick Start
 
-1. **To use the U2W tool**: Navigate to the [U2W Source Code](https://anonymous.4open.science/r/ASE_Arteafacts-75C5/U2W%20Source%20Code/README.md) folder and follow the setup instructions
-2. **To explore research data**: Check the [Empirical Studies Artifacts](https://anonymous.4open.science/r/ASE_Arteafacts-75C5/Empirical%20Studies%20Artifacts/README.md) folder for survey results, evaluation data, and example refactorings
+1. **To use the U2W tool**: Navigate to the [U2W Source Code](https://github.com/spideruci/U2W/tree/main/U2W%20Source%20Code#readme) folder and follow the setup instructions
+2. **To explore research data**: Check the [Empirical Studies Artifacts](https://github.com/spideruci/U2W/tree/main/Empirical%20Studies%20Artifacts#readme) folder for survey results, evaluation data, and example refactorings
 
 ---
 

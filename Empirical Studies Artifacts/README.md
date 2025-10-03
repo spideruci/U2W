@@ -22,29 +22,29 @@ The results of the developer survey can be found in the following files in the r
 Anonymous links to the PRs we raised can be found below:
 
 **Accepted/Merged:**
-- [PR 7512](https://anonymous.4open.science/pr/7512)
-- [PR B3C2](https://anonymous.4open.science/pr/B3C2)
-- [PR 8EF7](https://anonymous.4open.science/pr/8EF7)
-- [PR 4205](https://anonymous.4open.science/pr/4205)
-- [PR 1E44](https://anonymous.4open.science/pr/1E44)
-- [PR A8B8](https://anonymous.4open.science/pr/A8B8)
-- [PR 696B](https://anonymous.4open.science/pr/696B)
-- [PR 784D](https://anonymous.4open.science/pr/784D)
-- [PR 366D](https://anonymous.4open.science/pr/366D)
-- [PR 0F21](https://anonymous.4open.science/pr/0F21)
-- [PR 27BF](https://anonymous.4open.science/pr/27BF)
-- [PR DBBB](https://anonymous.4open.science/pr/DBBB)
-- [PR 3800](https://anonymous.4open.science/pr/3800)
-- [PR C043](https://anonymous.4open.science/pr/C043)
-- [PR 1E41](https://anonymous.4open.science/pr/1E41)
-- [PR F23C](https://anonymous.4open.science/pr/F23C)
+- [PR 1](https://github.com/apache/incubator-seata/pull/7286)
+- [PR 2](https://github.com/apache/incubator-seata/pull/7167)
+- [PR 3](https://github.com/apache/amoro/pull/3450)
+- [PR 4](https://github.com/apache/amoro/pull/3453)
+- [PR 5](https://github.com/apache/amoro/pull/3454)
+- [PR 6](https://github.com/apache/amoro/pull/3455)
+- [PR 7](https://github.com/apache/amoro/pull/3456)
+- [PR 8](https://github.com/apache/amoro/pull/3510)
+- [PR 9](https://github.com/apache/amoro/pull/3511)
+- [PR 10](https://github.com/apache/amoro/pull/3512)
+- [PR 11](https://github.com/apache/amoro/pull/3513)
+- [PR 12](https://github.com/apache/incubator-seata/pull/7160)
+- [PR 13](https://github.com/apache/incubator-seata/pull/7287)
+- [PR 14](https://github.com/apache/incubator-seata/pull/7294)
+- [PR 15](https://github.com/apache/incubator-seata/pull/7295)
+- [PR 16](https://github.com/apache/incubator-xtable/pull/703)
 
 **Pending/Open:**
-- [PR E667](https://anonymous.4open.science/pr/E667)
-- [PR 5BD8](https://anonymous.4open.science/pr/5BD8)
+- [PR 17](https://github.com/apache/commons-net/pull/328)
+- [PR 18](https://github.com/apache/incubator-baremaps/pull/958)
 
 **Rejected/Closed:**
-- [PR 6015](https://anonymous.4open.science/pr/6015)
+- [PR 19](https://github.com/jhy/jsoup/pull/2269)
 
 ---
 
