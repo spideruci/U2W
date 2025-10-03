@@ -1,4 +1,4 @@
-# ASE Artifacts
+# U2W (Untangling to Weave) DAT Test Smell Refactoring and Detection Tool
 
 This repository contains the complete set of artifacts for our ASE 2025 paper on **Disjoint Assertion Tangle (DAT) Smell** detection and refactoring in unit tests.
 
