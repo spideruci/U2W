@@ -13,7 +13,7 @@ Based on the previous analysis and script definitions:
 
 - These categories are mutually exclusive within each smell type comparison (Eager vs DAT, Verbose vs DAT)
 - All examples were extracted from actual test files in the subject projects directory
-
+- The full list of all combinations of DAT, Eager, and Verbose test methods in our study can be derived by referencing the "Test Method Analysis for Eager and Verbose Detection Across All Subjects.xlsx" in this directory, by following the thresholds listed above for Eager and Verbose test smells.
 
 
 ## Concrete Test Method Examples
