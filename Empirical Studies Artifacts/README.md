@@ -1,4 +1,4 @@
-# ASEArtefacts
+# ASE Artifacts
 
 This repo contains the artefacts for our ASE 2025 Disjoint Assertion Tangle (DAT) Smell paper.
 
